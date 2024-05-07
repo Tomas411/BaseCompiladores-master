@@ -113,6 +113,7 @@ asignacion  : ID IGUAL oal COMA declaracion
             | ID IGUAL oal PYC
             ;
 
+//puto el que lee
 
 COMP : IGUAL|'!='|'>'|'<';
 
