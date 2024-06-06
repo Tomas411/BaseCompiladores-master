@@ -56,7 +56,7 @@ instrucciones : instruccion instrucciones
               ;
 
 instruccion : declaracion
-            | ID asignacion
+            | asignacion
             | expresion PYC
             | while
             | if
@@ -79,7 +79,7 @@ mas_parametros : COMA parametro mas_parametros
 declaracion : parametros declaracion_continua ;
 
 declaracion_continua : PYC
-                     | asignacion 
+                     | asignacion_continua 
                      | PA parametros PB bloque
                      | PA parametros PB PYC
                      | COMA ID declaracion
@@ -87,18 +87,19 @@ declaracion_continua : PYC
 
 tipo : INT | DOUBLE | VOID | CHAR ;
 
-asignacion : IGUAL expresion mas_asignaciones
-           | (ADD_OP | SUB_OP | MUL_OP | DIV_OP | MOD_OP) IGUAL expresion mas_asignaciones
-           ;
+asignacion: ID asignacion_continua;
+
+asignacion_continua : IGUAL expresion mas_asignaciones;
 
 mas_asignaciones: PYC
-                | COMA asignacion
-                | asignacion
+                | COMA asignacion_continua
+                | asignacion_continua
                 ;
 
-expresion : oal op_expresion ;
+expresion : oal op_expresion
+          | ID (ADD_OP | SUB_OP | MUL_OP | DIV_OP | MOD_OP) IGUAL oal op_expresion ;
 
-op_expresion : (ADD_OP | SUB_OP | MUL_OP | DIV_OP | MOD_OP | AND_OP | OR_OP | EQ_OP | NEQ_OP | LT_OP | GT_OP | LTE_OP | GTE_OP) oal op_expresion // Agregado MOD_OP
+op_expresion : (ADD_OP | SUB_OP | MUL_OP | DIV_OP | MOD_OP | AND_OP | OR_OP | EQ_OP | NEQ_OP | LT_OP | GT_OP | LTE_OP | GTE_OP) oal op_expresion 
              | INC_OP
              | DEC_OP
              | COMA expresion
