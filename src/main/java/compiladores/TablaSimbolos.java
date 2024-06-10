@@ -2,6 +2,10 @@ package compiladores;
 
 import java.util.*;
 
+<<<<<<< HEAD
+=======
+// Enum para los tipos de datos
+>>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
 enum TipoDato {
     INT,
     CHAR,
@@ -9,6 +13,10 @@ enum TipoDato {
     VOID
 }
 
+<<<<<<< HEAD
+=======
+// Clase Identificador
+>>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
 class Identificador {
     protected String nombre;
     protected TipoDato tipoDato;
@@ -44,12 +52,20 @@ class Identificador {
     }
 }
 
+<<<<<<< HEAD
+=======
+// Clase Variable que hereda de Identificador
+>>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
 class Variable extends Identificador {
     public Variable(String nombre, TipoDato tipoDato) {
         super(nombre, tipoDato);
     }
 }
 
+<<<<<<< HEAD
+=======
+// Clase Funcion que hereda de Identificador
+>>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
 class Funcion extends Identificador {
     private List<TipoDato> argumentos;
 
@@ -68,6 +84,10 @@ class Funcion extends Identificador {
     }
 }
 
+<<<<<<< HEAD
+=======
+// Clase Contexto
+>>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
 class Contexto {
     private Map<String, Identificador> identificadores;
 
@@ -96,6 +116,11 @@ class Contexto {
     }
 }
 
+<<<<<<< HEAD
+=======
+
+// Clase TablaSimbolos
+>>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
 class TablaSimbolos {
     private List<Contexto> contextos;
 
@@ -118,7 +143,11 @@ class TablaSimbolos {
     public Identificador buscarIdentificador(Identificador id) {
         for (int i = contextos.size() - 1; i >= 0; i--) {
             Identificador identificador = contextos.get(i).buscarIdentificador(id);
+<<<<<<< HEAD
             if (identificador != null) { 
+=======
+            if (identificador != null) {
+>>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
                 return identificador;
             }
         }
@@ -140,14 +169,21 @@ class TablaSimbolos {
 
     public void identificadorInicializado(Identificador id) {
         for (int i = contextos.size() - 1; i >= 0; i--) {
+<<<<<<< HEAD
             Identificador identificador = contextos.get(i).buscarIdentificador(id);
             if (identificador != null) {
                 identificador.setInicializada(true);
+=======
+            Identificador encontrado = contextos.get(i).buscarIdentificador(id);
+            if (encontrado != null) {
+                encontrado.setInicializada(true);
+>>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
                 return;
             }
         }
     }
 
+<<<<<<< HEAD
     public List<Contexto> getContextos() {
         return contextos;
     }
@@ -164,6 +200,8 @@ class TablaSimbolos {
     }
 
     
+=======
+>>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
 
     public Identificador buscarIdentificadorLocal(Identificador id) {
         return contextos.get(contextos.size() - 1).buscarIdentificador(id);
@@ -172,4 +210,15 @@ class TablaSimbolos {
     public void addIdentificador(Identificador identificador) {
         contextos.get(contextos.size() - 1).addIdentificador(identificador);
     }
+<<<<<<< HEAD
+=======
+
+    public void print() {
+        for (Contexto contexto : contextos) {
+            for (Map.Entry<String, Identificador> entry : contexto.getIdentificadores().entrySet()) {
+                System.out.println(entry.getKey() + ": " + entry.getValue());
+            }
+        }
+    }
+>>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
 }
