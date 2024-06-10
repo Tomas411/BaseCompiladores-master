@@ -4,74 +4,15 @@ grammar compiladores;
 package compiladores;
 }
 
-// fragment LETRA : [A-Za-z] ;
-// fragment DIGITO : [0-9] ;
-
-// NUMERO : DIGITO+ ;
-// OTRO : . ;
-
-// ID : (LETRA | '_')(LETRA | DIGITO | '_')* ;
-
-// s : ID     { System.out.println("ID ->" + $ID.getText() + "<--"); }         s
-//   | NUMERO { System.out.println("NUMERO ->" + $NUMERO.getText() + "<--"); } s
-//   | OTRO   { System.out.println("Otro ->" + $OTRO.getText() + "<--"); }     s
-//   | EOF
-//   ;
-
-
-// PA : '(' ;
-// PB : ')' ;
-// CA : '[' ;
-// CB : ']' ;
-// LA : '{' ;
-// LB : '}' ;
-
-// si : s EOF;
-
-// s : CA s CB s
-//   | LA s LB s
-//   | PA s PB s
-//   |
-//   ;
-
-
-// fragment DIGITO : [0-9] ;
-// fragment DIGITOPAR : [02468] ;
-
-// NUMERO : DIGITO+ ;
-
-// MES_PAR: NUMERO '/' DIGITO DIGITOPAR '/' NUMERO;
-
-// HORA_MANIANA: '0' [89]':' NUMERO  
-//             | '1' [012] ':' NUMERO  
-//             ;
-
-// HORA_TARDE: '18' ':' [3-5]DIGITO
-//           | '19' ':' NUMERO 
-//           | '20' ':' NUMERO 
-//           | '21' ':' [012]DIGITO
-//           | '21:30'        
-//           ;
-
-// OTRO : (NUMERO '/' NUMERO '/' NUMERO)|(NUMERO ':' NUMERO);
-
-// WS: [ \t\r\n]+ -> skip;
-
-// si : s;
-// s:      MES_PAR {System.out.println("Linea " + $MES_PAR.getLine() + ": MES_PAR -> " + $MES_PAR.getText());} s
-//     |   HORA_MANIANA {System.out.println("Linea " + $HORA_MANIANA.getLine() + ": HORA_MANIANA -> " + $HORA_MANIANA.getText());}s
-//     |   HORA_TARDE {System.out.println("Linea " + $HORA_TARDE.getLine() + ": HORA_TARDE -> " + $HORA_TARDE.getText());}s
-//     |   OTRO   { }s
-//     |   EOF
-//   ;
-
 fragment LETRA : [A-Za-z] ;
 fragment DIGITO : [0-9] ;
 
 NUMERO : DIGITO+ ;
-
+COMILLA : '\'';
 INT : 'int';
 DOUBLE : 'double';
+VOID : 'void';
+CHAR : 'char';
 PYC : ';' ;
 IGUAL : '=';
 COMA : ',';
@@ -79,66 +20,133 @@ PA : '(' ;
 PB : ')' ;
 LA : '{' ;
 LB : '}' ;
+IF : 'if';
+ELSE : 'else';
 WHILE : 'while';
+FOR : 'for';
+RETURN : 'return';
+PUNTO : '.';
+FLOTANTE: NUMERO PUNTO NUMERO;
+CARACTER: COMILLA LETRA+ COMILLA;
+
+ADD_OP : '+' ;
+SUB_OP : '-' ;
+MUL_OP : '*' ;
+DIV_OP : '/' ;
+MOD_OP : '%' ;
+AND_OP : '&&' ;
+OR_OP : '||' ;
+NOT_OP : '!' ;
+EQ_OP : '==' ;
+NEQ_OP : '!=' ;
+LT_OP : '<' ;
+GT_OP : '>' ;
+LTE_OP : '<=' ;
+GTE_OP : '>=' ;
+INC_OP : '++' ;
+DEC_OP : '--' ;
 
 ID : (LETRA | '_')(LETRA | DIGITO | '_')* ;
 WS: [ \t\r\n]+ -> skip;
 
-// declaracion -> int x;
-//                double y;
-//                int z = 0;
-//                double w, q, t;
-//                int a = 5, b, c = 10;
 programa : instrucciones EOF;
 
-instrucciones : declaraciones instrucciones
-              | asignacion instrucciones
-              | while instrucciones
+instrucciones : instruccion instrucciones
               | 
               ;
 
-declaraciones : INT declaracion 
-              | DOUBLE declaracion 
-              ;
-
-declaracion : ID PYC
+instruccion : declaracion
             | asignacion
-            | ID COMA declaracion
+            | expresion PYC
+            | while
+            | if
+            | for
+            | llamada_funcion PYC
+            | bloque
+            | retorno
             ;
 
-// asignacion -> x = 1;
-//               z = y;
+parametros : parametro mas_parametros
+           | 
+           ;
 
-asignacion  : ID IGUAL oal COMA declaracion
-            | ID IGUAL oal PYC
-            ;
+parametro : tipo ID ;
 
-//puto el que lee!
+mas_parametros : COMA parametro mas_parametros
+               | 
+               ;
 
-COMP : IGUAL|'!='|'>'|'<';
+declaracion : parametros declaracion_continua ;
 
-//while -> while (x comp y) { instrucciones }
+declaracion_continua : PYC
+                     | asignacion_continua 
+                     | PA parametros PB bloque
+                     | PA parametros PB PYC
+                     | COMA ID declaracion
+                     ;
 
-while : WHILE PA ID COMP oal PB LA instrucciones LB;
+tipo : INT | DOUBLE | VOID | CHAR ;
+
+asignacion: ID asignacion_continua;
+
+asignacion_continua : IGUAL expresion mas_asignaciones
+                    | (ADD_OP | SUB_OP | MUL_OP | DIV_OP | MOD_OP) IGUAL expresion mas_asignaciones
+                    | INC_OP mas_asignaciones
+                    | DEC_OP mas_asignaciones
+                    ;
+
+
+mas_asignaciones: PYC
+                | COMA asignacion_continua
+                | asignacion_continua
+                | PB
+                ;
+
+expresion : oal op_expresion
+          ;
+
+op_expresion : (ADD_OP | SUB_OP | MUL_OP | DIV_OP | MOD_OP | AND_OP | OR_OP | EQ_OP | NEQ_OP | LT_OP | GT_OP | LTE_OP | GTE_OP) oal op_expresion 
+             | 
+             ;
 
 oal : NUMERO
+    | FLOTANTE
     | ID
+    | CARACTER
+    | llamada_funcion
     ;
 
+llamada_funcion : ID PA argumentos PB ;
 
+argumentos : expresion mas_argumentos
+           |
+           ;
 
+mas_argumentos : COMA argumentos
+               | 
+               ;
 
+bloque : LA instrucciones LB ;
 
+if : IF PA expresion PB bloque else_bloque ;
 
+else_bloque : ELSE bloque
+            | 
+            ;
 
+while : WHILE PA expresion PB bloque ;
 
+for : FOR PA for_continua for_continua for_continua bloque ;
 
+for_continua : declaracion for_continua
+             | asignacion for_continua
+             | expresion for_continua
+             | COMA for_continua
+             | PB
+             | PYC
+             | 
+             ;
 
-
-
-
-
-
-
-
-
+retorno : RETURN expresion PYC 
+        | RETURN PYC
+        ;
