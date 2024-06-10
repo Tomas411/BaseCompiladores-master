@@ -126,6 +126,7 @@ public class Escucha extends compiladoresBaseListener {
             }else tablaSimbolos.identificadorUtilizado(id);
         }
     }
+    
 
     @Override 
     public void exitIf(compiladoresParser.IfContext ctx) {

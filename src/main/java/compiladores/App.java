@@ -26,6 +26,7 @@ public class App {
         // Conecto el objeto con Listeners al parser
         parser.addParseListener(escucha);
 
+        
         parser.removeErrorListeners();
         parser.addErrorListener(new ErroresPersonalizados());
         // Solicito al parser que comience indicando una regla gramatical

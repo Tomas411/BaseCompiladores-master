@@ -163,6 +163,7 @@ class TablaSimbolos {
         }
     }
 
+    
 
     public Identificador buscarIdentificadorLocal(Identificador id) {
         return contextos.get(contextos.size() - 1).buscarIdentificador(id);

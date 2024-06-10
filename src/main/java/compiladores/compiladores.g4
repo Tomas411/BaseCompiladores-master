@@ -96,6 +96,7 @@ asignacion_continua : IGUAL expresion mas_asignaciones
                     ;
 
 
+
 mas_asignaciones: PYC
                 | COMA asignacion_continua
                 | asignacion_continua
