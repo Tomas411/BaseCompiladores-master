@@ -1,3 +1,4 @@
+
 grammar compiladores;
 
 @header {
@@ -89,7 +90,6 @@ tipo : INT | DOUBLE | VOID | CHAR ;
 
 asignacion: ID asignacion_continua;
 
-<<<<<<< HEAD
 asignacion_continua : IGUAL expresion mas_asignaciones
                     | (ADD_OP | SUB_OP | MUL_OP | DIV_OP | MOD_OP) IGUAL expresion mas_asignaciones
                     | INC_OP mas_asignaciones
@@ -97,14 +97,9 @@ asignacion_continua : IGUAL expresion mas_asignaciones
                     ;
 
 
-=======
-asignacion_continua : IGUAL expresion mas_asignaciones;
->>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
-
 mas_asignaciones: PYC
                 | COMA asignacion_continua
                 | asignacion_continua
-<<<<<<< HEAD
                 | PB
                 ;
 
@@ -112,17 +107,6 @@ expresion : oal op_expresion
           ;
 
 op_expresion : (ADD_OP | SUB_OP | MUL_OP | DIV_OP | MOD_OP | AND_OP | OR_OP | EQ_OP | NEQ_OP | LT_OP | GT_OP | LTE_OP | GTE_OP) oal op_expresion 
-=======
-                ;
-
-expresion : oal op_expresion
-          | ID (ADD_OP | SUB_OP | MUL_OP | DIV_OP | MOD_OP) IGUAL oal op_expresion ;
-
-op_expresion : (ADD_OP | SUB_OP | MUL_OP | DIV_OP | MOD_OP | AND_OP | OR_OP | EQ_OP | NEQ_OP | LT_OP | GT_OP | LTE_OP | GTE_OP) oal op_expresion 
-             | INC_OP
-             | DEC_OP
-             | COMA expresion
->>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
              | 
              ;
 
@@ -136,11 +120,7 @@ oal : NUMERO
 llamada_funcion : ID PA argumentos PB ;
 
 argumentos : expresion mas_argumentos
-<<<<<<< HEAD
            |
-=======
-           | 
->>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
            ;
 
 mas_argumentos : COMA argumentos
@@ -157,7 +137,6 @@ else_bloque : ELSE bloque
 
 while : WHILE PA expresion PB bloque ;
 
-<<<<<<< HEAD
 for : FOR PA for_continua for_continua for_continua bloque ;
 
 for_continua : declaracion for_continua
@@ -166,15 +145,6 @@ for_continua : declaracion for_continua
              | COMA for_continua
              | PB
              | PYC
-=======
-for : FOR PA for_continua for_continua for_continua PB bloque ;
-
-for_continua : declaracion for_continua
-             | expresion for_continua
-             | COMA for_continua
-             | PYC
-             | PB
->>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
              | 
              ;
 

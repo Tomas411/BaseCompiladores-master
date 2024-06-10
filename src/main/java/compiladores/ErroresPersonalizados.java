@@ -1,3 +1,4 @@
+
 package compiladores;
 
 import org.antlr.v4.parse.GrammarTreeVisitor.tokenSpec_return;
@@ -5,7 +6,6 @@ import org.antlr.v4.runtime.*;
 
 public class ErroresPersonalizados extends BaseErrorListener {
 
-    
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
         String error = "Línea " + line + ":" + charPositionInLine + " " + msg;

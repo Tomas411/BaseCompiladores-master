@@ -28,7 +28,6 @@ public class Escucha extends compiladoresBaseListener {
 
     @Override
     public void exitPrograma(compiladoresParser.ProgramaContext ctx) {
-<<<<<<< HEAD
         Set<Identificador> allIdentificadores = new HashSet<>();
         for (Contexto contexto : tablaSimbolos.getContextos()) {
             allIdentificadores.addAll(contexto.getIdentificadores().values());
@@ -45,11 +44,6 @@ public class Escucha extends compiladoresBaseListener {
     }
 
 
-=======
-        tablaSimbolos.delContexto();
-    }
-
->>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
     @Override
     public void exitParametro(compiladoresParser.ParametroContext ctx){
         String tipoDatoStr = ctx.tipo().getText();
@@ -58,10 +52,6 @@ public class Escucha extends compiladoresBaseListener {
         try {
             td = TipoDato.valueOf(tipoDatoStr.toUpperCase());
         } catch (IllegalArgumentException e) {
-<<<<<<< HEAD
-=======
-            System.out.println("ERROR, Tipo de dato no válido: " + tipoDatoStr + " en linea: " + ctx.ID().getSymbol().getLine());
->>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
             return;
         }
         
@@ -70,7 +60,6 @@ public class Escucha extends compiladoresBaseListener {
         if(tablaSimbolos.buscarIdentificador(id) == null){
             tablaSimbolos.addIdentificador(id);
         } else {
-<<<<<<< HEAD
             System.out.println("Error semántico, La variable " + id.tipoDato + " " + id.nombre + " ya existe. linea: " + ctx.ID().getSymbol().getLine());
         }
     }
@@ -87,9 +76,6 @@ public class Escucha extends compiladoresBaseListener {
             } else {
                 System.out.println("Error semántico, no se puede asignar un valor a una variable no creada. Identificador: " + nombre + " línea: " + ctx.parametros().parametro().ID().getSymbol().getLine());
             }
-=======
-            System.out.println("ERROR, La variable " + ctx.ID().toString() + " ya existe. linea: " + ctx.ID().getSymbol().getLine());
->>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
         }
     }
 
@@ -103,21 +89,11 @@ public class Escucha extends compiladoresBaseListener {
         if (tipo != null) {
             Identificador id = new Identificador(nombre, tipo);
             tablaSimbolos.identificadorInicializado(id);
-<<<<<<< HEAD
         } else {
             System.out.println("Error semántico, no se puede asignar un valor a una variable no creada. Identificador: " + nombre + " línea: " + ctx.ID().getSymbol().getLine());
         }
     }
 
-=======
-            System.out.println("inicializada " + id.getTipoDato().toString() + " " + id.getNombre() + " línea: " + ctx.ID().getSymbol().getLine());
-        } else {
-            System.out.println("Error, no se puede asignar un valor a una variable no creada. Identificador: " + nombre + " línea: " + ctx.ID().getSymbol().getLine());
-        }
-    }
-
-
->>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
     @Override
     public void exitLlamada_funcion(compiladoresParser.Llamada_funcionContext ctx) {
         String nombre = ctx.ID().getText();
@@ -125,7 +101,6 @@ public class Escucha extends compiladoresBaseListener {
 
         for (TipoDato tipo : TipoDato.values()) {
             Identificador id = new Identificador(nombre, tipo);
-<<<<<<< HEAD
             if (tablaSimbolos.buscarIdentificador(id) != null && tablaSimbolos.buscarIdentificador(id).inicializada == false) {
                 encontrado = true;
                 tablaSimbolos.identificadorUtilizado(id);
@@ -151,7 +126,6 @@ public class Escucha extends compiladoresBaseListener {
             }else tablaSimbolos.identificadorUtilizado(id);
         }
     }
-    
 
     @Override 
     public void exitIf(compiladoresParser.IfContext ctx) {
@@ -193,38 +167,6 @@ public class Escucha extends compiladoresBaseListener {
             return id;
         } 
         return null;
-=======
-            if (tablaSimbolos.buscarIdentificador(id).inicializada == false) {
-                encontrado = true;
-                break;
-            }
-        }
-
-        if (!encontrado) {
-            System.out.println("Error, no se puede asignar un valor a una variable no creada. Identificador: " + nombre + " línea: " + ctx.ID().getSymbol().getLine());
-        }
-    }
-
-
-    @Override
-    public void exitOal(compiladoresParser.OalContext ctx) {
-        if(ctx.ID() != null){
-            String nombre = ctx.ID().getText();
-            boolean encontrado = false;
-
-            for (TipoDato tipo : TipoDato.values()) {
-                Identificador id = new Identificador(nombre, tipo);
-                if (tablaSimbolos.buscarIdentificador(id) != null) {
-                    encontrado = true;
-                    break;
-                }
-            }
-
-            if (!encontrado) {
-                System.out.println("Error, no se puede asignar un valor a una variable no creada. Identificador: " + nombre + " línea: " + ctx.ID().getSymbol().getLine());
-            }
-        }
->>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
         
     }
 }

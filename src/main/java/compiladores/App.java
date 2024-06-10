@@ -25,13 +25,9 @@ public class App {
 
         // Conecto el objeto con Listeners al parser
         parser.addParseListener(escucha);
-<<<<<<< HEAD
 
-        
         parser.removeErrorListeners();
         parser.addErrorListener(new ErroresPersonalizados());
-=======
->>>>>>> 731b758be6dd0c7b38d5228c177cfb13a88fa4f2
         // Solicito al parser que comience indicando una regla gramatical
         // En este caso la regla es el simbolo inicial
         parser.programa();
