@@ -151,11 +151,23 @@ public interface compiladoresVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFor(compiladoresParser.ForContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link compiladoresParser#for_continua}.
+	 * Visit a parse tree produced by {@link compiladoresParser#inicializacion}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFor_continua(compiladoresParser.For_continuaContext ctx);
+	T visitInicializacion(compiladoresParser.InicializacionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link compiladoresParser#condicion}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCondicion(compiladoresParser.CondicionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link compiladoresParser#actualizacion}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitActualizacion(compiladoresParser.ActualizacionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link compiladoresParser#retorno}.
 	 * @param ctx the parse tree

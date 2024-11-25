@@ -80,11 +80,13 @@ mas_parametros : COMA parametro mas_parametros
 declaracion : parametros declaracion_continua ;
 
 declaracion_continua : PYC
-                     | asignacion_continua 
+                     | IGUAL expresion PYC
+                     | asignacion_continua
                      | PA parametros PB bloque
                      | PA parametros PB PYC
                      | COMA ID declaracion
                      ;
+
 
 tipo : INT | DOUBLE | VOID | CHAR ;
 
@@ -98,13 +100,15 @@ asignacion_continua : IGUAL expresion mas_asignaciones
 
 
 mas_asignaciones: PYC
-                | COMA asignacion_continua
+                | COMA asignacion 
                 | asignacion_continua
                 | PB
                 ;
 
 expresion : oal op_expresion
           ;
+
+CADENA : '"' (~["\\] | '\\' .)* '"' ;
 
 op_expresion : (ADD_OP | SUB_OP | MUL_OP | DIV_OP | MOD_OP | AND_OP | OR_OP | EQ_OP | NEQ_OP | LT_OP | GT_OP | LTE_OP | GTE_OP) oal op_expresion 
              | 
@@ -115,7 +119,9 @@ oal : NUMERO
     | ID
     | CARACTER
     | llamada_funcion
+    | PA expresion PB
     ;
+
 
 llamada_funcion : ID PA argumentos PB ;
 
@@ -137,16 +143,21 @@ else_bloque : ELSE bloque
 
 while : WHILE PA expresion PB bloque ;
 
-for : FOR PA for_continua for_continua for_continua bloque ;
+for : FOR PA inicializacion PYC condicion PYC actualizacion PB bloque ;
 
-for_continua : declaracion for_continua
-             | asignacion for_continua
-             | expresion for_continua
-             | COMA for_continua
-             | PB
-             | PYC
-             | 
-             ;
+inicializacion : declaracion
+               | asignacion
+               | 
+               ;
+
+condicion : expresion
+          | 
+          ;
+
+actualizacion : asignacion
+              | 
+              ;
+
 
 retorno : RETURN expresion PYC 
         | RETURN PYC

@@ -1,7 +1,6 @@
 
 package compiladores;
 
-import org.antlr.v4.parse.GrammarTreeVisitor.tokenSpec_return;
 import org.antlr.v4.runtime.*;
 
 public class ErroresPersonalizados extends BaseErrorListener {

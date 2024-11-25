@@ -1,16 +1,10 @@
 package compiladores;
 
-import org.antlr.v4.runtime.tree.ParseTreeProperty;
-import org.antlr.v4.runtime.Token;
-import compiladores.compiladoresBaseListener;
-import compiladores.compiladoresParser;
 
 import java.util.*;
 
 public class Escucha extends compiladoresBaseListener {
     private TablaSimbolos tablaSimbolos = new TablaSimbolos();
-    private List<String> errores = new ArrayList<>();
-    private ParseTreeProperty<TipoDato> tipos = new ParseTreeProperty<>();
 
     @Override
     public void enterPrograma(compiladoresParser.ProgramaContext ctx) {
@@ -159,14 +153,13 @@ public class Escucha extends compiladoresBaseListener {
         Identificador id = null;
         String nombre = null;
         if(ctx.oal().ID() != null) nombre = ctx.oal().ID().getText();
-        else if(ctx.oal().ID() != null) nombre = ctx.oal().ID().getText();
+        else if(ctx.oal().ID() != null) nombre = ctx.oal().ID().getText(); //tengo que fijarme esto
 
         for (TipoDato tipo : TipoDato.values()) {
             id = tablaSimbolos.buscarIdentificador(new Identificador(nombre, tipo));
             if(id != null)
             return id;
         } 
-        return null;
-        
+        return null;  
     }
 }

@@ -37,6 +37,7 @@ INC_OP=36
 DEC_OP=37
 ID=38
 WS=39
+CADENA=40
 '\''=2
 'int'=3
 'double'=4

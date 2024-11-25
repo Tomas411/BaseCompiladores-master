@@ -295,13 +295,37 @@ public class compiladoresBaseListener implements compiladoresListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFor_continua(compiladoresParser.For_continuaContext ctx) { }
+	@Override public void enterInicializacion(compiladoresParser.InicializacionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitFor_continua(compiladoresParser.For_continuaContext ctx) { }
+	@Override public void exitInicializacion(compiladoresParser.InicializacionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCondicion(compiladoresParser.CondicionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCondicion(compiladoresParser.CondicionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterActualizacion(compiladoresParser.ActualizacionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitActualizacion(compiladoresParser.ActualizacionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
