@@ -46,7 +46,7 @@ public class Caminante extends compiladoresBaseVisitor<String> {
     @Override
     public String visitDeclaracion(compiladoresParser.DeclaracionContext ctx) {
         if (ctx.parametros() == null || ctx.parametros().parametro() == null) {
-            return null; // Declaración vacía
+            return null;
         }
 
         String tipo = ctx.parametros().parametro().tipo().getText();
@@ -106,7 +106,7 @@ public class Caminante extends compiladoresBaseVisitor<String> {
             }
 
             agregarCodigo("end function");
-            tablaSimbolos.delContexto();
+            tablaSimbolos.delContexto(); // Eliminar el contexto de la función
             return null;
         }
 
@@ -122,7 +122,6 @@ public class Caminante extends compiladoresBaseVisitor<String> {
         }
         return null;
     }
-
 
     private TipoDato obtenerTipoDato(String tipo) {
         switch (tipo) {
@@ -179,24 +178,24 @@ public class Caminante extends compiladoresBaseVisitor<String> {
         if (ctx == null || ctx.getChildCount() == 0) {
             return operandoIzq; // No hay más operaciones, devolver el operando izquierdo
         }
-    
+
         // Obtener el operador y el segundo operando
         String operador = ctx.getChild(0).getText(); // El operador (+, -, *, etc.)
         String operandoDer = visit(ctx.oal()); // El segundo operando
-    
+
         // Generar un temporal para esta operación
         String temporal = nuevoTemporal();
         agregarCodigo(temporal + " = " + operandoIzq + " " + operador + " " + operandoDer + ";");
-    
+
         // Si hay más operaciones en op_expresion, continuar procesando
         if (ctx.op_expresion() != null && ctx.op_expresion().getChildCount() > 0) {
             return procesarOpExpresion(ctx.op_expresion(), temporal);
         }
-    
+
         // Devolver el resultado de la operación
         return temporal;
     }
-    
+
 
     // Visitador para operandos (oal)
     @Override
@@ -210,48 +209,54 @@ public class Caminante extends compiladoresBaseVisitor<String> {
                 throw new RuntimeException("Variable no declarada: " + id);
             }
             if (!identificador.inicializada) {
-                throw new RuntimeException("Variable no inicializada: " + id);
+                // Inicialización predeterminada si no está inicializada
+                agregarCodigo(id + " = 0;");
+                tablaSimbolos.identificadorInicializado(identificador);
             }
             return id;
         } else if (ctx.llamada_funcion() != null) {
             return visit(ctx.llamada_funcion());
         } else if (ctx.PA() != null && ctx.PB() != null) {
-            // Procesar la expresión dentro de paréntesis
             return visit(ctx.expresion());
         }
 
         throw new RuntimeException("Operando no reconocido: " + ctx.getText());
     }
 
+
     @Override
     public String visitIf(compiladoresParser.IfContext ctx) {
+        tablaSimbolos.addContexto(); // Crear un nuevo contexto para el bloque if
         String etiquetaVerdadero = nuevaEtiqueta();
         String etiquetaFalso = nuevaEtiqueta();
         String etiquetaFin = nuevaEtiqueta();
-    
+
         // Evaluar la condición
         String condicion = visit(ctx.expresion());
         agregarCodigo("if " + condicion + " goto " + etiquetaVerdadero);
         agregarCodigo("goto " + etiquetaFalso);
-    
+
         // Bloque verdadero
         agregarCodigo(etiquetaVerdadero + ":");
         visit(ctx.bloque());
-    
+
         // Salto al final
         agregarCodigo("goto " + etiquetaFin);
-    
+
         // Bloque falso
         agregarCodigo(etiquetaFalso + ":");
-        if (ctx.else_bloque() != null) {
+        if (ctx.else_bloque() != null && ctx.else_bloque().bloque() != null) {
             visit(ctx.else_bloque().bloque());
         }
-    
+
         // Etiqueta de fin
         agregarCodigo(etiquetaFin + ":");
+        tablaSimbolos.delContexto(); // Eliminar el contexto del if
         return null;
     }
-    
+
+
+
     @Override
     public String visitWhile(compiladoresParser.WhileContext ctx) {
         String etiquetaInicio = nuevaEtiqueta();
@@ -284,22 +289,18 @@ public class Caminante extends compiladoresBaseVisitor<String> {
         String etiquetaCondicion = nuevaEtiqueta(); // Evaluación de la condición
         String etiquetaFin = nuevaEtiqueta();      // Salida del bucle
 
-        // Procesar inicialización (puede ser declaración o asignación)
-        if (ctx.inicializacion() != null && ctx.inicializacion().getChildCount() > 0) {
+        // Procesar inicialización
+        if (ctx.inicializacion() != null) {
             visit(ctx.inicializacion());
         }
 
-        // Etiqueta para evaluar la condición
         agregarCodigo(etiquetaInicio + ":");
 
         // Evaluar condición
-        if (ctx.condicion() != null && ctx.condicion().getChildCount() > 0) {
+        if (ctx.condicion() != null) {
             String condicion = visit(ctx.condicion());
             agregarCodigo("if " + condicion + " goto " + etiquetaCondicion);
             agregarCodigo("goto " + etiquetaFin); // Salir si la condición es falsa
-        } else {
-            // Si no hay condición, el bucle es infinito
-            agregarCodigo("goto " + etiquetaCondicion);
         }
 
         // Cuerpo del bucle
@@ -307,7 +308,7 @@ public class Caminante extends compiladoresBaseVisitor<String> {
         visit(ctx.bloque());
 
         // Actualización del iterador
-        if (ctx.actualizacion() != null && ctx.actualizacion().getChildCount() > 0) {
+        if (ctx.actualizacion() != null) {
             visit(ctx.actualizacion());
         }
 
@@ -321,6 +322,8 @@ public class Caminante extends compiladoresBaseVisitor<String> {
         return null;
     }
 
+
+
     @Override
     public String visitLlamada_funcion(compiladoresParser.Llamada_funcionContext ctx) {
         String nombreFuncion = ctx.ID().getText();
@@ -333,10 +336,8 @@ public class Caminante extends compiladoresBaseVisitor<String> {
         // Procesar los argumentos de la función
         List<String> argumentos = new ArrayList<>();
         if (ctx.argumentos() != null && ctx.argumentos().expresion() != null) {
-            // Procesar el primer argumento
             argumentos.add(visit(ctx.argumentos().expresion()));
 
-            // Procesar argumentos adicionales en mas_argumentos
             compiladoresParser.Mas_argumentosContext masArgumentosCtx = ctx.argumentos().mas_argumentos();
             while (masArgumentosCtx != null) {
                 if (masArgumentosCtx.argumentos() != null && masArgumentosCtx.argumentos().expresion() != null) {
@@ -357,11 +358,12 @@ public class Caminante extends compiladoresBaseVisitor<String> {
 
         return null; // Las funciones void no devuelven valores
     }
-    
+
+
     @Override
     public String visitRetorno(compiladoresParser.RetornoContext ctx) {
-        // Si la función es void, no se permite retornar un valor
         TipoDato tipoFuncion = obtenerTipoFuncionActual();
+
         if (tipoFuncion == TipoDato.VOID) {
             if (ctx.expresion() != null) {
                 throw new RuntimeException("No se puede retornar un valor en una función void.");
@@ -377,6 +379,7 @@ public class Caminante extends compiladoresBaseVisitor<String> {
         }
         return null;
     }
+
 
     private TipoDato obtenerTipoFuncionActual() {
         // Buscar la función actual en la tabla de símbolos

@@ -1,5 +1,7 @@
 package compiladores;
 
+import java.util.List;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -13,16 +15,16 @@ public class App {
 
         // create a lexer that feeds off of input CharStream
         compiladoresLexer lexer = new compiladoresLexer(input);
-        
+
         // create a buffer of tokens pulled from the lexer
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        
+
         // create a parser that feeds off the tokens buffer
         compiladoresParser parser = new compiladoresParser(tokens);
-                
+
         // create Listener
         Escucha escucha = new Escucha();
- 
+
         // Conecto el objeto con Listeners al parser
         parser.addParseListener(escucha);
 
@@ -32,16 +34,26 @@ public class App {
         // En este caso la regla es el simbolo inicial
         ParseTree tree =  parser.programa();
         // Conectamos el visitor
-        Caminante visitor = new Caminante();
-        visitor.visit(tree);
-        // Imprimir el código de tres direcciones
-        for (String line : visitor.getC3DCode()) {
-            System.out.println(line);
-        }/* 
-        System.out.println(visitor);
-        // Imprime el arbol obtenido
-        System.out.println(tree.toStringTree(parser));
-        System.out.println(escucha);
-        */
+        Caminante caminante = new Caminante();
+        caminante.visit(tree);
+        List<String> codigoC3D = caminante.getC3DCode();
+
+        System.out.println("código sin optimizar");
+        // Imprimir el código sin optimizar
+        for (String linea : codigoC3D) {
+            System.out.println(linea);
+        }
+
+        // Crear instancia del optimizador
+        Optimizador optimizador = new Optimizador(codigoC3D);
+
+        // Obtener código optimizado
+        List<String> codigoOptimizado = optimizador.optimizar();
+
+        System.out.println("código optimizado");
+        // Imprimir el código optimizado
+        for (String linea : codigoOptimizado) {
+            System.out.println(linea);
+        }
     }
 }

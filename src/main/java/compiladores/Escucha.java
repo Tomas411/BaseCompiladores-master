@@ -7,10 +7,6 @@ public class Escucha extends compiladoresBaseListener {
     private TablaSimbolos tablaSimbolos = new TablaSimbolos();
 
     @Override
-    public void enterPrograma(compiladoresParser.ProgramaContext ctx) {
-    }
-
-    @Override
     public void enterBloque(compiladoresParser.BloqueContext ctx) {
         tablaSimbolos.addContexto();
     }
@@ -41,14 +37,14 @@ public class Escucha extends compiladoresBaseListener {
     @Override
     public void exitParametro(compiladoresParser.ParametroContext ctx){
         String tipoDatoStr = ctx.tipo().getText();
-        
+
         TipoDato td;
         try {
             td = TipoDato.valueOf(tipoDatoStr.toUpperCase());
         } catch (IllegalArgumentException e) {
             return;
         }
-        
+
         Identificador id = new Identificador(ctx.ID().toString(), td);
 
         if(tablaSimbolos.buscarIdentificador(id) == null){
@@ -58,12 +54,12 @@ public class Escucha extends compiladoresBaseListener {
         }
     }
 
-    @Override 
-    public void exitDeclaracion(compiladoresParser.DeclaracionContext ctx) { 
+    @Override
+    public void exitDeclaracion(compiladoresParser.DeclaracionContext ctx) {
         if(ctx.declaracion_continua() != null && ctx.declaracion_continua().asignacion_continua() != null && ctx.parametros().parametro() != null){
             String nombre = ctx.parametros().parametro().ID().toString();
             TipoDato tipo = tablaSimbolos.buscarTipoIdentificador(nombre);
-            
+
             if (tipo != null) {
                 Identificador id = new Identificador(nombre, tipo);
                 tablaSimbolos.identificadorInicializado(id);
@@ -106,60 +102,78 @@ public class Escucha extends compiladoresBaseListener {
         }
     }
 
-    @Override 
-    public void exitArgumentos(compiladoresParser.ArgumentosContext ctx) { 
+    @Override
+    public void exitArgumentos(compiladoresParser.ArgumentosContext ctx) {
         if(ctx.expresion() != null){
             Identificador id = salirExpresion(ctx.expresion());
             if(id == null){
                 if(ctx.expresion().oal().ID() != null && ctx.expresion().oal().ID().getSymbol() != null)
-                System.out.println("Error semántico en argumentos, no se puede comparar variables no creadas. Identificador:  " + ctx.expresion().oal().ID() + " línea: " + ctx.expresion().oal().ID().getSymbol().getLine());
-            } else 
+                    System.out.println("Error semántico en argumentos, no se puede comparar variables no creadas. Identificador:  " + ctx.expresion().oal().ID() + " línea: " + ctx.expresion().oal().ID().getSymbol().getLine());
+            } else
             if(id.inicializada == false){
                 if(ctx.expresion().oal().ID() != null && ctx.expresion().oal().ID().getSymbol() != null)
-                System.out.println("Error semántico en argumentos, no se puede comparar variables no inicializada. Identificador:  " + ctx.expresion().oal().ID() + " línea: " + ctx.expresion().oal().ID().getSymbol().getLine());
+                    System.out.println("Error semántico en argumentos, no se puede comparar variables no inicializada. Identificador:  " + ctx.expresion().oal().ID() + " línea: " + ctx.expresion().oal().ID().getSymbol().getLine());
             }else tablaSimbolos.identificadorUtilizado(id);
         }
     }
 
-    @Override 
+    @Override
     public void exitIf(compiladoresParser.IfContext ctx) {
         Identificador id = salirExpresion(ctx.expresion());
         if(id == null){
             if(ctx.expresion().oal().ID() != null && ctx.expresion().oal().ID().getSymbol() != null)
-            System.out.println("Error semántico en If, no se puede comparar variables no creadas. Identificador:  " + ctx.expresion().oal().ID() + " línea: " + ctx.expresion().oal().ID().getSymbol().getLine());
-        } else 
+                System.out.println("Error semántico en If, no se puede comparar variables no creadas. Identificador:  " + ctx.expresion().oal().ID() + " línea: " + ctx.expresion().oal().ID().getSymbol().getLine());
+        } else
         if(id.inicializada == false){
             if(ctx.expresion().oal().ID() != null && ctx.expresion().oal().ID().getSymbol() != null)
-            System.out.println("Error semántico en If, no se puede comparar variables no inicializada. Identificador:  " + ctx.expresion().oal().ID() + " línea: " + ctx.expresion().oal().ID().getSymbol().getLine());
+                System.out.println("Error semántico en If, no se puede comparar variables no inicializada. Identificador:  " + ctx.expresion().oal().ID() + " línea: " + ctx.expresion().oal().ID().getSymbol().getLine());
         }else tablaSimbolos.identificadorUtilizado(id);
     }
 
-    @Override 
-    public void exitFor_continua(compiladoresParser.For_continuaContext ctx) { 
-        if(ctx.expresion() != null){
-            Identificador id = salirExpresion(ctx.expresion());
-            if(id == null){
-                if(ctx.expresion().oal().ID() != null && ctx.expresion().oal().ID().getSymbol() != null)
-                System.out.println("Error semántico en For, no se puede comparar variables no creadas. Identificador:  " + ctx.expresion().oal().ID() + " línea: " + ctx.expresion().oal().ID().getSymbol().getLine());
-            } else 
-            if(id.inicializada == false){
-                if(ctx.expresion().oal().ID() != null && ctx.expresion().oal().ID().getSymbol() != null)
-                System.out.println("Error semántico en For, no se puede comparar variables no inicializada. Identificador:  " + ctx.expresion().oal().ID() + " línea: " + ctx.expresion().oal().ID().getSymbol().getLine());
-            } else tablaSimbolos.identificadorUtilizado(id);
+    @Override
+    public void exitExpresion(compiladoresParser.ExpresionContext ctx) {
+        if (ctx.oal() != null && ctx.oal().ID() != null) {
+            String nombre = ctx.oal().ID().getText();
+            Identificador id = tablaSimbolos.buscarIdentificador(new Identificador(nombre, null));
+
+            if (id != null) {
+                tablaSimbolos.identificadorUtilizado(id);
+            }
+        }
+
+        if (ctx.op_expresion() != null) {
+            procesarOpExpresion(ctx.op_expresion());
         }
     }
-    
+
+    private void procesarOpExpresion(compiladoresParser.Op_expresionContext ctx) {
+        if (ctx == null || ctx.oal() == null || ctx.oal().ID() == null) {
+            return;
+        }
+
+        String nombre = ctx.oal().ID().getText();
+        Identificador id = tablaSimbolos.buscarIdentificador(new Identificador(nombre, null));
+
+        if (id != null) {
+            tablaSimbolos.identificadorUtilizado(id);
+        }
+
+        if (ctx.op_expresion() != null) {
+            procesarOpExpresion(ctx.op_expresion());
+        }
+    }
+
     Identificador salirExpresion(compiladoresParser.ExpresionContext ctx){
         Identificador id = null;
         String nombre = null;
         if(ctx.oal().ID() != null) nombre = ctx.oal().ID().getText();
-        else if(ctx.oal().ID() != null) nombre = ctx.oal().ID().getText(); //tengo que fijarme esto
+        else if(ctx.oal().ID() != null) nombre = ctx.oal().ID().getText();
 
         for (TipoDato tipo : TipoDato.values()) {
             id = tablaSimbolos.buscarIdentificador(new Identificador(nombre, tipo));
             if(id != null)
-            return id;
-        } 
-        return null;  
+                return id;
+        }
+        return null;
     }
 }
