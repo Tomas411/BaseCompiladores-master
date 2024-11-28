@@ -5,6 +5,8 @@ import java.util.*;
 
 public class Escucha extends compiladoresBaseListener {
     private TablaSimbolos tablaSimbolos = new TablaSimbolos();
+    private List<String> errores = new ArrayList<>();
+    private List<String> warnings = new ArrayList<>();
 
     @Override
     public void enterBloque(compiladoresParser.BloqueContext ctx) {
@@ -26,7 +28,7 @@ public class Escucha extends compiladoresBaseListener {
         // Verificar si han sido utilizados
         for (Identificador id : allIdentificadores) {
             if (!id.utilizada) {
-                System.out.println("Warning semántico: El identificador " + id.nombre + " de tipo " + id.tipoDato + " ha sido declarado pero no utilizado.");
+                warnings.add("Warning semántico: El identificador " + id.nombre + " de tipo " + id.tipoDato + " ha sido declarado pero no utilizado.");
             }
         }
 
@@ -47,10 +49,10 @@ public class Escucha extends compiladoresBaseListener {
 
         Identificador id = new Identificador(ctx.ID().toString(), td);
 
-        if(tablaSimbolos.buscarIdentificador(id) == null){
+        if(tablaSimbolos.buscarIdentificadorLocal(id) == null){
             tablaSimbolos.addIdentificador(id);
         } else {
-            System.out.println("Error semántico, La variable " + id.tipoDato + " " + id.nombre + " ya existe. linea: " + ctx.ID().getSymbol().getLine());
+            errores.add("Error semántico, La variable " + id.tipoDato + " " + id.nombre + " ya existe. linea: " + ctx.ID().getSymbol().getLine());
         }
     }
 
@@ -64,7 +66,7 @@ public class Escucha extends compiladoresBaseListener {
                 Identificador id = new Identificador(nombre, tipo);
                 tablaSimbolos.identificadorInicializado(id);
             } else {
-                System.out.println("Error semántico, no se puede asignar un valor a una variable no creada. Identificador: " + nombre + " línea: " + ctx.parametros().parametro().ID().getSymbol().getLine());
+                errores.add("Error semántico, no se puede asignar un valor a una variable no creada. Identificador: " + nombre + " línea: " + ctx.parametros().parametro().ID().getSymbol().getLine());
             }
         }
     }
@@ -80,7 +82,7 @@ public class Escucha extends compiladoresBaseListener {
             Identificador id = new Identificador(nombre, tipo);
             tablaSimbolos.identificadorInicializado(id);
         } else {
-            System.out.println("Error semántico, no se puede asignar un valor a una variable no creada. Identificador: " + nombre + " línea: " + ctx.ID().getSymbol().getLine());
+            errores.add("Error semántico, no se puede asignar un valor a una variable no creada. Identificador: " + nombre + " línea: " + ctx.ID().getSymbol().getLine());
         }
     }
 
@@ -98,7 +100,7 @@ public class Escucha extends compiladoresBaseListener {
             }
         }
         if (!encontrado) {
-            System.out.println("Error semántico, no se puede usar una funcion no creada. Identificador: " + nombre + " línea: " + ctx.ID().getSymbol().getLine());
+            errores.add("Error semántico, no se puede usar una funcion no creada. Identificador: " + nombre + " línea: " + ctx.ID().getSymbol().getLine());
         }
     }
 
@@ -108,11 +110,11 @@ public class Escucha extends compiladoresBaseListener {
             Identificador id = salirExpresion(ctx.expresion());
             if(id == null){
                 if(ctx.expresion().oal().ID() != null && ctx.expresion().oal().ID().getSymbol() != null)
-                    System.out.println("Error semántico en argumentos, no se puede comparar variables no creadas. Identificador:  " + ctx.expresion().oal().ID() + " línea: " + ctx.expresion().oal().ID().getSymbol().getLine());
+                    errores.add("Error semántico en argumentos, no se puede comparar variables no creadas. Identificador:  " + ctx.expresion().oal().ID() + " línea: " + ctx.expresion().oal().ID().getSymbol().getLine());
             } else
             if(id.inicializada == false){
                 if(ctx.expresion().oal().ID() != null && ctx.expresion().oal().ID().getSymbol() != null)
-                    System.out.println("Error semántico en argumentos, no se puede comparar variables no inicializada. Identificador:  " + ctx.expresion().oal().ID() + " línea: " + ctx.expresion().oal().ID().getSymbol().getLine());
+                    errores.add("Error semántico en argumentos, no se puede comparar variables no inicializada. Identificador:  " + ctx.expresion().oal().ID() + " línea: " + ctx.expresion().oal().ID().getSymbol().getLine());
             }else tablaSimbolos.identificadorUtilizado(id);
         }
     }
@@ -122,11 +124,11 @@ public class Escucha extends compiladoresBaseListener {
         Identificador id = salirExpresion(ctx.expresion());
         if(id == null){
             if(ctx.expresion().oal().ID() != null && ctx.expresion().oal().ID().getSymbol() != null)
-                System.out.println("Error semántico en If, no se puede comparar variables no creadas. Identificador:  " + ctx.expresion().oal().ID() + " línea: " + ctx.expresion().oal().ID().getSymbol().getLine());
+                errores.add("Error semántico en If, no se puede comparar variables no creadas. Identificador:  " + ctx.expresion().oal().ID() + " línea: " + ctx.expresion().oal().ID().getSymbol().getLine());
         } else
         if(id.inicializada == false){
             if(ctx.expresion().oal().ID() != null && ctx.expresion().oal().ID().getSymbol() != null)
-                System.out.println("Error semántico en If, no se puede comparar variables no inicializada. Identificador:  " + ctx.expresion().oal().ID() + " línea: " + ctx.expresion().oal().ID().getSymbol().getLine());
+                errores.add("Error semántico en If, no se puede comparar variables no inicializada. Identificador:  " + ctx.expresion().oal().ID() + " línea: " + ctx.expresion().oal().ID().getSymbol().getLine());
         }else tablaSimbolos.identificadorUtilizado(id);
     }
 
@@ -175,5 +177,25 @@ public class Escucha extends compiladoresBaseListener {
                 return id;
         }
         return null;
+    }
+
+    public boolean hayErrores() {
+        return !errores.isEmpty();
+    }
+
+    public boolean hayWarnings() {
+        return !warnings.isEmpty();
+    }
+
+    public void mostrarWarnings() {
+        for (String warning : warnings) {
+            System.out.println(warning);
+        }
+    }
+
+    public void mostrarErrores() {
+        for (String error : errores) {
+            System.out.println(error);
+        }
     }
 }
